@@ -1,0 +1,44 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraCollision : MonoBehaviour
+{
+    public float minDistance = 1.0f;
+    public float maxDistance = 4.0f;
+    public float smooth = 10.0f;
+    Vector3 dollyDir;
+    public Vector3 dollyDirAdjusted;
+    public float distance;
+    public LayerMask layerMask;
+    private Vector3 initPos;
+    private Vector3 desiredCameraPos;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        dollyDir = transform.localPosition.normalized;
+        distance = transform.localPosition.magnitude;
+        initPos = transform.localPosition;
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+   
+        desiredCameraPos = transform.parent.TransformPoint(dollyDir * maxDistance);      
+        
+        RaycastHit hit;
+        if(Physics.Linecast(transform.parent.position,desiredCameraPos, out hit, layerMask))
+        {
+            distance = Mathf.Clamp((hit.distance * 0.25f), minDistance, maxDistance);
+        }
+        else
+        {
+            distance = maxDistance;
+        }
+        transform.localPosition = Vector3.Lerp(transform.localPosition, dollyDir * distance, Time.deltaTime * smooth);
+        }
+
+}
